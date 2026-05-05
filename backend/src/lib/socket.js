@@ -40,12 +40,21 @@ import http from "http";
 import express from "express";
 
 const app = express();
+
+// ✅ REQUIRED FOR RENDER (cookies + proxy)
+app.set("trust proxy", 1);
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: [
+            "http://localhost:5173",
+            "https://sayhi-chat-app.vercel.app" // ✅ ADD THIS (production frontend)
+        ],
+        credentials: true, // ✅ REQUIRED for cookies
     },
+    transports: ["websocket"], // ✅ IMPORTANT (Render + Vercel stability)
 });
 
 // 🔥 store userId -> socketId
@@ -54,6 +63,18 @@ const userSocketMap = {};
 export function getReceiverSocketId(userId) {
     return userSocketMap[userId];
 }
+
+// ✅ OPTIONAL BUT IMPORTANT (auth safety)
+io.use((socket, next) => {
+    const userId = socket.handshake.query.userId;
+
+    if (!userId) {
+        return next(new Error("Unauthorized"));
+    }
+
+    socket.userId = userId;
+    next();
+});
 
 io.on("connection", (socket) => {
     console.log("✅ User connected:", socket.id);
@@ -108,7 +129,6 @@ io.on("connection", (socket) => {
             delete userSocketMap[userId];
         }
 
-        // 🔥 FIXED TYPO HERE
         io.emit("getOnlineUsers", Object.keys(userSocketMap));
     });
 });
