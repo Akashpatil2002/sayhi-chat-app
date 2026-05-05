@@ -130,10 +130,31 @@ export const login = async (req, res) => {
     }
 };
 
+// export const logout = (req, res) => {
+//     try {
+//         res.cookie("jwt", "", { maxAge: 0 })
+//         res.status(200).json({ message: "Logged out successfully" });
+//     } catch (error) {
+//         console.log("Error in logout controller", error.message);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// };
+
 export const logout = (req, res) => {
     try {
-        res.cookie("jwt", "", { maxAge: 0 })
+        // ✅ tumhara original code (same)
+        res.cookie("jwt", "", { maxAge: 0 });
+
+        // 🔥 ADD THIS (production fix - Vercel + Render)
+        res.cookie("jwt", "", {
+            httpOnly: true,
+            expires: new Date(0),
+            secure: true,
+            sameSite: "none",
+        });
+
         res.status(200).json({ message: "Logged out successfully" });
+
     } catch (error) {
         console.log("Error in logout controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
@@ -162,9 +183,13 @@ export const updateProfile = async (req, res) => {
 
 export const checkAuth = (req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Not logged in" });
+        }
+
         res.status(200).json(req.user);
+
     } catch (error) {
-        console.log("Error in checkAuth controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};

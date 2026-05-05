@@ -18,29 +18,41 @@ export const useAuthStore = create((set, get) => ({
     // ✅ ADD THIS
     setAuthUser: (user) => set({ authUser: user }),
 
+    // checkAuth: async () => {
+    //     try {
+    //         const res = await axiosInstance.get("/auth/check");
+
+    //         console.log("CHECK AUTH RESPONSE:", res.data);
+
+    //         if (res.data?._id) {
+    //             set({ authUser: res.data });
+    //             get().connectSocket();
+    //         } else {
+    //             set({ authUser: null });
+    //         }
+
+    //     } catch (error) {
+    //         if (error.response?.status !== 401) {
+    //             console.log("Error in checkAuth:", error);
+    //         }
+    //         set({ authUser: null });
+    //     } finally {
+    //         set({ isCheckingAuth: false });
+    //     }
+    // },
     checkAuth: async () => {
         try {
             const res = await axiosInstance.get("/auth/check");
 
-            console.log("CHECK AUTH RESPONSE:", res.data);
-
-            if (res.data?._id) {
-                set({ authUser: res.data });
-                get().connectSocket();
-            } else {
-                set({ authUser: null });
-            }
+            set({ authUser: res.data });
 
         } catch (error) {
-            if (error.response?.status !== 401) {
-                console.log("Error in checkAuth:", error);
-            }
-            set({ authUser: null });
+            set({ authUser: null }); // 🔥 always logout if no cookie
         } finally {
             set({ isCheckingAuth: false });
         }
     },
-
+    
     signup: async (data) => {
         set({ isSigningUp: true });
         try {
@@ -71,7 +83,7 @@ export const useAuthStore = create((set, get) => ({
 
     logout: async () => {
         try {
-            await axiosInstance.post("/auth/logout");
+            await axiosInstance.post("/ath/logout");
             set({ authUser: null });
             toast.success("Logged out successfully");
             get().disconnectSocket();
