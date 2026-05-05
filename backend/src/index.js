@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 // ✅ FIXED CORS
 app.use(cors({
-    origin: "https://sayhi-chat-app.vercel.app", // ✅ ONLY DOMAIN
+    origin: "https://sayhi-chat-app.vercel.app",
     credentials: true,
 }));
 

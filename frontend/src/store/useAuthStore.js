@@ -6,11 +6,6 @@ import { io } from "socket.io-client";
 // const BASE_URL = "http://localhost:5001"
 const BASE_URL = "https://sayhi-chat-app.onrender.com"
 
-const socket = io(BASE_URL, {
-    withCredentials: true,
-    transports: ["websocket"], // 🔥 IMPORTANT
-});
-
 export const useAuthStore = create((set, get) => ({
     authUser: null,
     isSigningUp: false,
@@ -19,7 +14,6 @@ export const useAuthStore = create((set, get) => ({
     isCheckingAuth: true,
     onlineUsers: [],
     socket: null,
-
 
     // ✅ ADD THIS
     setAuthUser: (user) => set({ authUser: user }),
@@ -104,13 +98,16 @@ export const useAuthStore = create((set, get) => ({
         const { authUser } = get();
         if (!authUser || get().socket?.connected) return;
 
-        const socket = io(BASE_URL, {
+        const socket = io("https://sayhi-chat-app.onrender.com", {
+            withCredentials: true,      // ✅ MUST
+            transports: ["websocket"],  // ✅ MUST
             query: {
                 userId: authUser._id,
             },
         });
 
         socket.connect();
+
         set({ socket });
 
         socket.on("getOnlineUsers", (userIds) => {
