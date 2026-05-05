@@ -127,7 +127,7 @@ const Sidebar = () => {
                                         user.profilePic
                                             ? user.profilePic.startsWith("http")
                                                 ? user.profilePic.replace("=s96-c", "=s400-c")
-                                                : `http://localhost:5001${user.profilePic}`
+                                                : `https://sayhi-chat-app.onrender.com${user.profilePic}`
                                             : "/avatar.png"
                                     }
                                     alt={user.fullName}
