@@ -25,6 +25,7 @@ const LoginPage = () => {
 
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const navigate = useNavigate();
+    const { setAuthUser, checkAuth } = useAuthStore(); // ✅ important
 
     const handleGoogleLogin = useGoogleLogin({
         flow: "auth-code",
@@ -39,14 +40,16 @@ const LoginPage = () => {
 
                 console.log("LOGIN SUCCESS:", res.data);
 
-                // ✅ FIXED
+                // ✅ Step 1: local state update
                 setAuthUser(res.data);
+
+                // ✅ Step 2: VERY IMPORTANT (cookie verify)
+                await checkAuth();   // 🔥 FIX
 
                 toast.success("Google Login Success");
 
-                setTimeout(() => {
-                    navigate("/", { replace: true });
-                }, 200);
+                // ✅ Step 3: redirect
+                navigate("/", { replace: true });
 
             } catch (error) {
                 console.log("API ERROR:", error.response?.data);

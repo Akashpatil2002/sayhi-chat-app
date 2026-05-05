@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
-    withCredentials: true,
+  baseURL: "https://sayhi-chat-app.onrender.com/api",
+  withCredentials: true, // ✅ MUST
 });
